@@ -23,3 +23,5 @@ Backend: Xaml
 Database: SQLite for storing tasks and user data
 
 Calendar Library: FullCalendar (for calendar integration)
+
+I did not know we needed a github commits so I have only just commited it today.
