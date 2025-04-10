@@ -1,0 +1,106 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:viewmodel="clr-namespace:MauiApp2.ViewModel"
+             xmlns:models="clr-namespace:MauiApp2.Models"
+             xmlns:converters="clr-namespace:MauiApp2.Converters"
+             x:DataType="viewmodel:MainViewModel"
+             x:Class="MauiApp2.MainPage"
+             Title="Tasks">
+
+    <ContentPage.Resources>
+        <converters:BoolToStrikethroughConverter x:Key="BoolToStrikethroughConverter" />
+        <converters:PriorityToColorConverter x:Key="PriorityToColorConverter" />
+    </ContentPage.Resources>
+
+    <Grid RowDefinitions="Auto,*,Auto" Padding="10">
+        <!-- Header -->
+        <Image 
+        Grid.Row="0"
+        Source="todo.png"
+        HeightRequest="100"
+        Aspect="AspectFit"
+        HorizontalOptions="Center"
+        />
+
+
+        <!-- Task List -->
+        <CollectionView Grid.Row="1" ItemsSource="{Binding Tasks}">
+            <CollectionView.ItemTemplate>
+                <DataTemplate x:DataType="models:TodoTask">
+                    <SwipeView>
+                        <SwipeView.RightItems>
+                            <SwipeItems>
+                                <SwipeItem Text="Delete"
+                                           BackgroundColor="Red"
+                                           Command="{Binding Source={RelativeSource AncestorType={x:Type viewmodel:MainViewModel}}, Path=DeleteTaskCommand}"
+                                           CommandParameter="{Binding .}" />
+                            </SwipeItems>
+                        </SwipeView.RightItems>
+
+                        <Border Margin="0,5" Padding="10">
+                            <Grid ColumnDefinitions="Auto,*,Auto" RowDefinitions="Auto,Auto,Auto">
+                                <CheckBox IsChecked="{Binding IsCompleted}" 
+                                         Grid.RowSpan="3"
+                                         VerticalOptions="Center"/>
+
+                                <Label Text="{Binding Title}" 
+                                       Grid.Column="1"
+                                       FontAttributes="{Binding IsCompleted, Converter={StaticResource BoolToStrikethroughConverter}}"/>
+
+                                <Label Text="{Binding Description}" 
+                                       Grid.Column="1" 
+                                       Grid.Row="1"
+                                       FontSize="Small"
+                                       TextColor="Gray"/>
+
+                                <Label Text="{Binding DueDateFormatted}" 
+                                       Grid.Column="1"
+                                       Grid.Row="2"
+                                       FontSize="Small"
+                                       TextColor="DarkGray"/>
+
+                                <BoxView Grid.Column="2" 
+                                         Grid.RowSpan="3"
+                                         WidthRequest="10"
+                                         BackgroundColor="{Binding TaskPriority, Converter={StaticResource PriorityToColorConverter}}"
+                                         VerticalOptions="Fill"
+                                         HorizontalOptions="End"/>
+
+                                <Grid.GestureRecognizers>
+                                    <TapGestureRecognizer 
+                                        Command="{Binding Source={RelativeSource AncestorType={x:Type viewmodel:MainViewModel}}, Path=ViewTaskDetailsCommand}"
+                                        CommandParameter="{Binding .}" />
+                                </Grid.GestureRecognizers>
+                            </Grid>
+                        </Border>
+                    </SwipeView>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+        </CollectionView>
+
+        <!-- Add Task Form -->
+        <VerticalStackLayout Grid.Row="2" Spacing="10" Padding="0,10,0,0">
+            <Entry Placeholder="Task title" Text="{Binding TaskTitle}" />
+            <Entry Placeholder="Task description" Text="{Binding TaskDescription}" />
+            <HorizontalStackLayout Spacing="10">
+                <Label Text="Due Date:" VerticalOptions="Center" />
+                <DatePicker Date="{Binding TaskDueDate}" />
+            </HorizontalStackLayout>
+            <HorizontalStackLayout Spacing="10">
+                <Label Text="Priority:" VerticalOptions="Center" />
+                <Picker SelectedItem="{Binding TaskPriority}">
+                    <Picker.ItemsSource>
+                        <x:Array Type="{x:Type models:Priority}">
+                            <models:Priority>Low</models:Priority>
+                            <models:Priority>Medium</models:Priority>
+                            <models:Priority>High</models:Priority>
+                            <models:Priority>Urgent</models:Priority>
+                        </x:Array>
+                    </Picker.ItemsSource>
+                </Picker>
+            </HorizontalStackLayout>
+            <Button Text="Add Task" Command="{Binding AddTaskCommand}" />
+        </VerticalStackLayout>
+    </Grid>
+</ContentPage>

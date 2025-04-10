@@ -1,0 +1,54 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="MauiApp2.CalendarPage"
+             xmlns:viewmodel="clr-namespace:MauiApp2.ViewModel"
+             xmlns:models="clr-namespace:MauiApp2.Models"
+             x:DataType="viewmodel:CalendarViewModel"
+             Title="Calendar"
+             xmlns:converters="clr-namespace:MauiApp2.Converters">
+    <ContentPage.Resources>
+        <converters:BoolToStrikethroughConverter x:Key="BoolToStrikethroughConverter" />
+        <converters:PriorityToColorConverter x:Key="PriorityToColorConverter" />
+    </ContentPage.Resources>
+    <VerticalStackLayout Padding="20">
+        <DatePicker Date="{Binding SelectedDate}"
+                   Format="D"
+                   Margin="0,20,0,0"/>
+        <Label Text="{Binding SelectedDateText}"
+               FontSize="20"
+               Margin="0,20,0,0"/>
+        <CollectionView ItemsSource="{Binding TasksOnSelectedDate}"
+                       Margin="0,20,0,0"
+                       EmptyView="No tasks for this date">
+            <CollectionView.ItemTemplate>
+                <DataTemplate x:DataType="models:TodoTask">
+                    <Border Margin="0,5" Padding="10">
+                        <Grid ColumnDefinitions="Auto,*,Auto" RowDefinitions="Auto,Auto">
+                            <CheckBox IsChecked="{Binding IsCompleted}" 
+                                     Grid.RowSpan="2"
+                                     VerticalOptions="Center"/>
+
+                            <Label Text="{Binding Title}" 
+                                   Grid.Column="1"
+                                   FontAttributes="{Binding IsCompleted, Converter={StaticResource BoolToStrikethroughConverter}}"/>
+
+                            <Label Text="{Binding Description}" 
+                                   Grid.Column="1" 
+                                   Grid.Row="1"
+                                   FontSize="Small"
+                                   TextColor="Gray"/>
+
+                            <BoxView Grid.Column="2" 
+                                     Grid.RowSpan="2"
+                                     WidthRequest="10"
+                                     BackgroundColor="{Binding TaskPriority, Converter={StaticResource PriorityToColorConverter}}"
+                                     VerticalOptions="Fill"
+                                     HorizontalOptions="End"/>
+                        </Grid>
+                    </Border>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+        </CollectionView>
+    </VerticalStackLayout>
+</ContentPage>
